@@ -11,22 +11,25 @@ import sys
 import requests
 import json
 import execjs
+import os
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-with open('google_tk.js', "r") as f:
+_SCRIPT_PATH = os.path.split(os.path.realpath(__file__))[0]
+with open(os.path.join(_SCRIPT_PATH, 'google_tk.js'), "r") as f:
     _JS_CODE = "".join(f.readlines())
 
 JS_LAUNCHER = execjs.compile(_JS_CODE.decode('utf8'))
 
 
 def trans(source, _from, _to):
-    proxies = {
-        "http": "http://127.0.0.1:1080",
-        "https": "http://127.0.0.1:1080"}
-    tk=JS_LAUNCHER.call('TK', source)
-    burp0_url = "https://translate.google.co.jp:443/translate_a/single?client=t&sl={from_lang}&tl={to_lang}&hl={to_lang}&dt=t&ie=UTF-8&oe=UTF-8&source=btn&tk={tk}&q={source}".format(source=source, from_lang=_from, to_lang=_to, tk=tk)
+    # proxies = {
+    #     "http": "http://127.0.0.1:1080",
+    #     "https": "http://127.0.0.1:1080"}
+    tk = JS_LAUNCHER.call('TK', source)
+    burp0_url = "https://translate.google.co.jp:443/translate_a/single?client=t&sl={from_lang}&tl={to_lang}&hl={to_lang}&dt=t&ie=UTF-8&oe=UTF-8&source=btn&tk={tk}&q={source}".format(
+        source=source, from_lang=_from, to_lang=_to, tk=tk)
 
     burp0_headers = {
         "Connection": "close",
@@ -41,16 +44,15 @@ def trans(source, _from, _to):
     failed = True
     while failed:
         try:
-            r = requests.get(burp0_url, headers=burp0_headers, proxies=proxies)
+            r = requests.get(burp0_url, headers=burp0_headers)
             failed = False
-        except requests.exceptions.SSLError:
+        except requests.exceptions.SSLError, requests.exceptions.ConnectionError:
             sys.stderr.write('SSLError: Try again...\n')
             failed = True
-        print tk
-        print r.status_code
-        print r.text
+            # print r.status_code
     ret = json.loads(r.text.decode('utf8'))
-    ret = ret[0][0][0]
+    rets = map(lambda e: e[0], ret[0])
+    ret = "".join(rets)
     return ret
 
 

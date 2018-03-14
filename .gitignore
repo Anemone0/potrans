@@ -5,3 +5,4 @@ zh-CN
 *.pyc
 *.spec
 *.po
+*.po*

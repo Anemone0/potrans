@@ -37,7 +37,6 @@ class Translator:
         self.from_lang = from_lang
         self.to_lang = to_lang
         self.email = email
-        print self.email
 
     def translate(self, source):
         if self.from_lang == self.to_lang:
@@ -49,7 +48,8 @@ class Translator:
         return ' '.join(ret)
 
     def _get_translation_from_google(self, source):
-        escaped_source = quote(source, '')
+        # escaped_source = quote(source, '')
+        escaped_source = source
         return trans.trans(
             escaped_source, self.from_lang, self.to_lang)
         # ret=None
@@ -108,8 +108,8 @@ def TranPo(from_file, to_lang, email):
 
     if not os.path.exists(output_path):
         os.mkdir(output_path)
-    output_filename = os.path.split(from_file)[1].split('.')[0]
-    with open(os.path.join(output_path, output_filename + ".po"), 'w+') as out_file:
+    # output_filename = os.path.split(from_file)[1].split('.')[0]
+    with open(os.path.join(output_path, from_file), 'w+') as out_file:
         with open(from_file, 'r') as f:
             lines = f.readlines()
             for line in lines:
