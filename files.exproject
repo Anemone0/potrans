@@ -1,0 +1,31 @@
+" Press <F1> for help
+
+-[F]utils {
+ |-[F]build {
+ | |-[F]mymemorytrans {
+ |   |-mymemorytrans.exe.manifest
+ |   |-out00-Analysis.toc
+ |   |-out00-EXE.toc
+ |   |-out00-PKG.pkg
+ |   |-out00-PKG.toc
+ |   |-out00-PYZ.pyz
+ |   |-out00-PYZ.toc
+ |   |-warnmymemorytrans.txt
+ |   |-xref-mymemorytrans.html } }
+ |
+ |-[F]dist {
+ | |-mymemorytrans.exe }
+ |
+ |-[F]zh-CN {
+ | |-zh_CN.po }
+ |
+ |-files.exproject
+ |-google_tk.js
+ |-googletrans.py
+ |-mymemorytrans.py
+ |-mymemorytrans.spec
+ |-pytrans.py
+ |-readme.md
+ |-zh_CN.po }
+
+

@@ -20,7 +20,10 @@ behind it. You can also use it as a Python module in your code.
 import re
 import json
 from textwrap import wrap
-import mymemorytrans
+import googletrans as trans
+import sys
+import os
+import argparse
 try:
     import urllib2 as request
     from urllib import quote
@@ -47,7 +50,8 @@ class Translator:
 
     def _get_translation_from_google(self, source):
         escaped_source = quote(source, '')
-        return mymemorytrans.mymemorytrans(source, self.from_lang, self.to_lang)
+        return trans.trans(
+            escaped_source, self.from_lang, self.to_lang)
         # ret=None
         # while ret==None:
         #     json5 = self._get_json5_from_google(source)
@@ -76,13 +80,10 @@ class Translator:
         return r.read().decode('utf-8')
 
 
-__author__ = "Lingfeng Ai"
+__author__ = "Lingfeng Ai; Anemone Xu"
 """
 使用google翻译自动翻译.po文件到指定语言
 """
-import sys
-import os
-import argparse
 
 
 def getOriginal(line, key="\"", default=None):
@@ -96,55 +97,20 @@ def TargetText(translator, original):
     return "\"" + translator.translate(original) + "\"" + "\n"
 
 
-def main(defvals=None):
+def TranPo(from_file, to_lang, email):
     isnewOne = False
     sentence = ""
     count = 0.0
-    parser = argparse.ArgumentParser()
 
-    if defvals is None:
-        defvals = {'f': 'Cura.po', 't': 'ita', 'e': None}
+    translator = Translator(to_lang=to_lang, email=email)
 
-    parser.add_argument(
-        '-f',
-        '--from',
-        dest='from_file',
-        type=str,
-        default=defvals['f'],
-        help='From language (e.g. zh, zh-TW, en, ja, ko). Default is ' +
-        defvals['f'] +
-        '.')
-    parser.add_argument(
-        '-t',
-        '--to',
-        dest='to_lang',
-        type=str,
-        default=defvals['t'],
-        help='To language (e.g. zh, zh-TW, en, ja, ko). Default is ' +
-        defvals['t'] +
-        '.')
-
-    parser.add_argument(
-        '-e',
-        '--email',
-        dest='email',
-        type=str,
-        default=defvals['e'],
-        help='To language (e.g. zh, zh-TW, en, ja, ko). Default is ' +
-        "None" +
-        '.')
-
-    args = parser.parse_args()
-
-    translator = Translator(to_lang=args.to_lang, email=args.email)
-
-    output_path = os.path.abspath('.') + "/" + args.to_lang  # 创建目标文件的位置
+    output_path = os.path.abspath('.') + "/" + to_lang  # 创建目标文件的位置
 
     if not os.path.exists(output_path):
         os.mkdir(output_path)
-    output_filename=os.path.split(args.from_file)[1].split('.')[0]
+    output_filename = os.path.split(from_file)[1].split('.')[0]
     with open(os.path.join(output_path, output_filename + ".po"), 'w+') as out_file:
-        with open(args.from_file, 'r') as f:
+        with open(from_file, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 count += 1
@@ -187,6 +153,43 @@ def main(defvals=None):
                         count /
                         len(lines) *
                         100))
+
+
+def main():
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '-f',
+        '--from',
+        dest='from_file',
+        type=str,
+        default='en.po',
+        help='From language (e.g. zh, zh-TW, en, ja, ko). Default is ' +
+        'en.po' +
+        '.')
+    parser.add_argument(
+        '-t',
+        '--to',
+        dest='to_lang',
+        type=str,
+        default='zh-CN',
+        help='To language (e.g. zh, zh-TW, en, ja, ko). Default is ' +
+        'zh-CN' +
+        '.')
+
+    parser.add_argument(
+        '-e',
+        '--email',
+        dest='email',
+        type=str,
+        default='test@test.com',
+        help='To language (e.g. zh, zh-TW, en, ja, ko). Default is ' +
+        'test@test.com' +
+        '.')
+
+    args = parser.parse_args()
+    TranPo(args.from_file, args.to_lang, args.email)
 
 
 if __name__ == '__main__':
